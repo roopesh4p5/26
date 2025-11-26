@@ -1671,7 +1671,7 @@ function quizGame(container) {
     container.innerHTML = `
         <p style="margin-bottom: 20px; text-align: center;">Repeat the pattern!</p>
         <div id="matrix-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 240px; margin: 0 auto;"></div>
-        <p id="matrix-level" style="text-align: center; margin-top: 20px; font-weight: bold;">Level: 1 / 5</p>
+        <p id="matrix-level" style="text-align: center; margin-top: 20px; font-weight: bold;">Level: 1 / 3</p>
     `;
     
     const grid = container.querySelector('#matrix-grid');
@@ -1734,7 +1734,7 @@ function quizGame(container) {
             levelDisplay.textContent = "Wrong! Try again.";
             playerSeq = [];
             setTimeout(() => {
-                levelDisplay.textContent = `Level: ${level} / 5`;
+                levelDisplay.textContent = `Level: ${level} / 3`;
                 playSequence();
             }, 1000);
             return;
@@ -1743,10 +1743,10 @@ function quizGame(container) {
         if (playerSeq.length === sequence.length) {
             level++;
             playerSeq = [];
-            if (level > 5) {
+            if (level > 3) {
                 setTimeout(() => onGameComplete(), 500);
             } else {
-                levelDisplay.textContent = `Level: ${level} / 5`;
+                levelDisplay.textContent = `Level: ${level} / 3`;
                 setTimeout(playSequence, 1000);
             }
         }
