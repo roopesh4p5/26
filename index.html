@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Happy Birthday Radha!</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💝</text></svg>"
+    />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css?v=1.7" />
+  </head>
+  <body class="dark-theme">
+    <!-- Password Protection Page -->
+    <div id="password-page" class="password-page active">
+      <div class="password-content">
+        <div class="heart-container">
+          <i class="fas fa-heart heart-icon"></i>
+        </div>
+        <h1 class="password-title">Hey You! </h1>
+        <p class="password-question">Kya kar rahi ho?</p>
+        <input 
+          type="text" 
+          id="password-input" 
+          class="password-input" 
+          placeholder="Type your answer..."
+          autocomplete="off"
+        />
+        <p id="password-error" class="password-error"></p>
+        <button class="password-button" onclick="checkPassword()">
+          <span>Enter</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Landing Page -->
+    <div id="landing-page" class="landing-page">
+      <div class="landing-content">
+        <div class="heart-container">
+          <i class="fas fa-heart heart-icon"></i>
+        </div>
+        <h1 class="landing-title">Happy Birthday Radha!</h1>
+        <p class="landing-subtitle">24 Saal, 24 Yaadein</p>
+        <p class="landing-message">
+          Teri zindagi ke har saal ki ek khaas yaad...<br />
+          Thoda upar neeche ho sakta hai...🥺 <br />
+          (denji: I said you Chuu hai tera boyfriend... 😂)
+        </p>
+        <button class="start-button" onclick="startJourney()">
+          <span>Shuru karein?</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+      <div class="flowers-decoration">
+        <i class="fas fa-spa flower"></i>
+        <i class="fas fa-spa flower"></i>
+        <i class="fas fa-spa flower"></i>
+      </div>
+    </div>
+
+    <!-- Main Gift Page -->
+    <div id="main-page" class="main-page">
+      <!-- Background Music -->
+      <audio id="background-music" loop>
+        <source src="01.mp3" type="audio/mpeg" />
+      </audio>
+
+      <div class="container">
+        <!-- Single Gift View -->
+        <div id="single-view" class="single-view active">
+          <!-- Progress Indicator -->
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p class="progress-text" id="progress-text">Gift 1 of 24</p>
+          </div>
+
+          <!-- Gift Card -->
+          <div class="gift-card" id="gift-card">
+            <!-- Scratch Overlay (for era cards) -->
+            <div
+              class="scratch-overlay"
+              id="scratch-overlay"
+              style="display: none"
+            >
+              <canvas id="scratch-canvas"></canvas>
+              <div class="scratch-instruction">
+                <i class="fas fa-hand-pointer"></i>
+                <pk>Scratch Scratch Scratch!</p>
+              </div>
+            </div>
+
+            <!-- Card Header -->
+            <div class="gift-card-header">
+              <div class="age-badge">
+                <span class="age-label">Age</span>
+                <span class="age-number" id="current-age">1</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="gift-card-body">
+              <div class="gift-icon-large">
+                <i class="fas fa-gift"></i>
+              </div>
+              <h2 class="gift-title" id="current-gift-title">Gift Name</h2>
+              <div class="divider">
+                <i class="fas fa-heart"></i>
+              </div>
+              <p class="gift-message" id="current-gift-message">
+                Your message here...
+              </p>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="gift-card-footer">
+              <button
+                class="nav-button prev-button"
+                onclick="previousGift()"
+                id="prev-btn"
+              >
+                <i class="fas fa-chevron-left"></i>
+                <span>Previous</span>
+              </button>
+              <!-- Conditionally show either Play or Next button -->
+              <button
+                class="nav-button game-button"
+                onclick="startGame()"
+                id="play-unlock-btn"
+                style="display: none"
+              >
+                <i class="fas fa-lock"></i>
+                <span>Play to Unlock</span>
+              </button>
+              <button
+                class="nav-button next-button"
+                onclick="nextGift()"
+                id="next-btn"
+                style="display: none"
+              >
+                <span>Next</span>
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid View -->
+        <div id="grid-view" class="grid-view">
+          <h2 class="grid-title">All Your Gifts</h2>
+          <div class="gift-grid" id="gift-grid">
+            <!-- Gift boxes will be generated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="game-modal" id="game-modal">
+      <div class="game-modal-content">
+        <div class="game-modal-header">
+          <h3 class="game-modal-title" id="game-title">Mini Game</h3>
+          <button class="game-close-btn" onclick="closeGame()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="game-modal-body" id="game-content">
+          <!-- Game content loads here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" id="bottom-nav">
+      <button class="nav-item" id="view-toggle" onclick="toggleView()">
+        <i class="fas fa-th" id="view-icon"></i>
+        <span class="nav-label" id="view-label">All Gifts</span>
+      </button>
+      <button class="nav-item" id="music-toggle" onclick="toggleMusic()">
+        <i class="fas fa-music" id="music-icon"></i>
+        <span class="nav-label">Music</span>
+      </button>
+      <button class="nav-item active" id="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-sun" id="theme-icon"></i>
+        <span class="nav-label">Light</span>
+      </button>
+      <button class="nav-item" id="reset-button" onclick="resetProgress()">
+        <i class="fas fa-rotate-right" id="reset-icon"></i>
+        <span class="nav-label">Reset</span>
+      </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js?v=1.7"></script>
+    <script src="games.js?v=1.7"></script>
+  </body>
+</html>
