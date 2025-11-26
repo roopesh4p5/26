@@ -1755,99 +1755,170 @@ function quizGame(container) {
     setTimeout(playSequence, 1000);
 }
 
-// Game 24: The Final Boss - Bullet Hell Heart
+// Game 24: Space Shooter - Shoot the Aliens
 function heartUnlock(container) {
     container.innerHTML = `
-        <p style="margin-bottom: 10px; text-align: center;">Protect the Heart! Dodge bullets for 15s.</p>
-        <canvas id="boss-canvas" width="300" height="400" style="border: 2px solid #ff0088; border-radius: 10px; display: block; margin: 0 auto; background: #000;"></canvas>
-        <p id="boss-timer" style="text-align: center; margin-top: 10px; font-weight: bold; color: #ff0088;">Time: 15.0s</p>
+        <p style="margin-bottom: 10px; text-align: center;">Shoot 15 aliens to win!</p>
+        <canvas id="space-canvas" width="300" height="400" style="border: 2px solid #4CAF50; border-radius: 10px; display: block; margin: 0 auto; background: #001; cursor: crosshair;"></canvas>
+        <p id="space-score" style="text-align: center; margin-top: 10px; font-weight: bold; color: #4CAF50;">Score: 0 / 15</p>
     `;
-    
-    const canvas = container.querySelector('#boss-canvas');
+
+    const canvas = container.querySelector('#space-canvas');
     const ctx = canvas.getContext('2d');
-    const timerDisplay = container.querySelector('#boss-timer');
-    
-    let player = {x: 150, y: 200, r: 10};
+    const scoreDisplay = container.querySelector('#space-score');
+
+    let player = {x: 150, y: 350, width: 30, height: 30};
+    let aliens = [];
     let bullets = [];
-    let timeLeft = 15;
+    let score = 0;
     let gameActive = true;
-    let angle = 0;
-    
+    let mouseX = 150;
+
+    // Create initial aliens
+    function spawnAlien() {
+        if (!gameActive) return;
+        aliens.push({
+            x: Math.random() * (canvas.width - 30),
+            y: -30,
+            width: 30,
+            height: 30,
+            speed: 1 + Math.random() * 1.5
+        });
+        if (gameActive && score < 15) {
+            setTimeout(spawnAlien, 800);
+        }
+    }
+
+    function shootBullet() {
+        bullets.push({
+            x: player.x + player.width / 2 - 2,
+            y: player.y,
+            width: 4,
+            height: 10,
+            speed: 7
+        });
+    }
+
     function update() {
         if (!gameActive) return;
-        
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+
+        // Clear screen
+        ctx.fillStyle = '#001';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Player Heart
-        ctx.fillStyle = '#ff0088';
+
+        // Draw stars
+        ctx.fillStyle = '#fff';
+        for (let i = 0; i < 50; i++) {
+            const x = (i * 37) % canvas.width;
+            const y = (i * 53 + Date.now() * 0.05) % canvas.height;
+            ctx.fillRect(x, y, 1, 1);
+        }
+
+        // Update and draw player
+        player.x = mouseX - player.width / 2;
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+
+        // Draw player ship
+        ctx.fillStyle = '#4CAF50';
         ctx.beginPath();
-        ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+        ctx.moveTo(player.x + player.width / 2, player.y);
+        ctx.lineTo(player.x, player.y + player.height);
+        ctx.lineTo(player.x + player.width, player.y + player.height);
+        ctx.closePath();
         ctx.fill();
-        
-        // Spawn bullets
-        if (Math.random() < 0.2) {
-            const side = Math.floor(Math.random() * 4);
-            let b = {x:0, y:0, vx:0, vy:0, r: 5};
-            if (side === 0) { b.x = Math.random()*300; b.y = 0; }
-            if (side === 1) { b.x = 300; b.y = Math.random()*400; }
-            if (side === 2) { b.x = Math.random()*300; b.y = 400; }
-            if (side === 3) { b.x = 0; b.y = Math.random()*400; }
-            
-            const angle = Math.atan2(player.y - b.y, player.x - b.x);
-            b.vx = Math.cos(angle) * 3;
-            b.vy = Math.sin(angle) * 3;
-            bullets.push(b);
-        }
-        
-        // Update bullets
-        bullets = bullets.filter(b => {
-            b.x += b.vx;
-            b.y += b.vy;
-            
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Collision
-            const dist = Math.hypot(player.x - b.x, player.y - b.y);
-            if (dist < player.r + b.r) {
-                // Hit!
-                ctx.fillStyle = 'red';
-                ctx.fillRect(0,0,300,400);
-                timeLeft = 15; // Reset time
-                bullets = [];
-            }
-            
-            return b.x > -10 && b.x < 310 && b.y > -10 && b.y < 410;
+
+        // Update and draw bullets
+        bullets = bullets.filter(bullet => {
+            bullet.y -= bullet.speed;
+
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+
+            return bullet.y > -10;
         });
-        
-        // Timer
-        timeLeft -= 0.016;
-        timerDisplay.textContent = `Time: ${Math.max(0, timeLeft).toFixed(1)}s`;
-        
-        if (timeLeft <= 0) {
-            gameActive = false;
-            setTimeout(() => onGameComplete(), 500);
-        }
-        
+
+        // Update and draw aliens
+        aliens = aliens.filter(alien => {
+            alien.y += alien.speed;
+
+            // Check bullet collision
+            let hit = false;
+            bullets = bullets.filter(bullet => {
+                if (bullet.x < alien.x + alien.width &&
+                    bullet.x + bullet.width > alien.x &&
+                    bullet.y < alien.y + alien.height &&
+                    bullet.y + bullet.height > alien.y) {
+                    hit = true;
+                    score++;
+                    scoreDisplay.textContent = `Score: ${score} / 15`;
+
+                    // Create explosion effect
+                    ctx.fillStyle = '#ff0';
+                    ctx.beginPath();
+                    ctx.arc(alien.x + alien.width/2, alien.y + alien.height/2, 15, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (score >= 15) {
+                        gameActive = false;
+                        setTimeout(() => onGameComplete(), 500);
+                    }
+                    return false;
+                }
+                return true;
+            });
+
+            if (hit) return false;
+
+            // Draw alien
+            ctx.fillStyle = '#f44336';
+            ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(alien.x + 5, alien.y + 10, 8, 8);
+            ctx.fillRect(alien.x + 17, alien.y + 10, 8, 8);
+
+            // Remove if off screen
+            return alien.y < canvas.height;
+        });
+
         requestAnimationFrame(update);
     }
-    
+
+    // Mouse controls
+    canvas.addEventListener('mousemove', e => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+    });
+
+    canvas.addEventListener('click', () => {
+        if (gameActive) {
+            shootBullet();
+        }
+    });
+
+    // Touch controls
     canvas.addEventListener('touchmove', e => {
         e.preventDefault();
         const rect = canvas.getBoundingClientRect();
-        player.x = e.touches[0].clientX - rect.left;
-        player.y = e.touches[0].clientY - rect.top;
+        mouseX = e.touches[0].clientX - rect.left;
     });
-    
-    canvas.addEventListener('mousemove', e => {
-        const rect = canvas.getBoundingClientRect();
-        player.x = e.clientX - rect.left;
-        player.y = e.clientY - rect.top;
+
+    canvas.addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (gameActive) {
+            shootBullet();
+        }
     });
-    
+
+    // Auto-shoot for easier gameplay
+    const autoShoot = setInterval(() => {
+        if (gameActive && aliens.length > 0) {
+            shootBullet();
+        } else if (!gameActive) {
+            clearInterval(autoShoot);
+        }
+    }, 300);
+
+    spawnAlien();
     update();
 }
 
